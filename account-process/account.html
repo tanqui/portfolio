@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="env.js"></script>
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --bg:         #ffffff;
+        --fg:         #09090b;
+        --muted:      #71717a;
+        --border:     #e4e4e7;
+        --surface:    #fafafa;
+        --btn-bg:     #18181b;
+        --btn-fg:     #fafafa;
+        --btn-hover:  #27272a;
+        --btn-ghost-hover: #f4f4f5;
+        --radius:     8px;
+        --radius-sm:  6px;
+        --font-head:  'Syne', sans-serif;
+        --font-body:  'Plus Jakarta Sans', sans-serif;
+        --shadow-card: 0 4px 24px 0 rgb(0 0 0 / .06), 0 1px 2px 0 rgb(0 0 0 / .04);
+      }
+
+      html, body { height: 100%; font-family: var(--font-body); background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; }
+
+      /* Loading */
+      #loadingScreen { position: fixed; inset: 0; background: var(--bg); display: grid; place-items: center; z-index: 10; transition: opacity .2s; }
+      #loadingScreen.fade-out { opacity: 0; pointer-events: none; }
+      .loader-dot { width: 8px; height: 8px; background: #d4d4d8; border-radius: 50%; display: inline-block; animation: pulse .9s ease-in-out infinite both; }
+      .loader-dot:nth-child(2) { animation-delay: .15s; margin: 0 4px; }
+      .loader-dot:nth-child(3) { animation-delay: .3s; }
+      @keyframes pulse { 0%,80%,100%{transform:scale(.7);opacity:.4;} 40%{transform:scale(1);opacity:1;} }
+
+      /* Layout */
+      .page { min-height: 100%; display: grid; grid-template-rows: 56px 1fr; }
+
+      /* Topbar */
+      .topbar { border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      .topbar-brand { display: flex; align-items: center; gap: 10px; }
+      .logo-mark { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--fg); border-radius: 6px; flex-shrink: 0; }
+      .brand-name { font-family: var(--font-head); font-size: 15px; font-weight: 600; letter-spacing: -.2px; }
+
+      /* Steps */
+      .steps { display: flex; align-items: center; }
+      .step { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+      .step.active { color: var(--fg); }
+      .step.done   { color: #16a34a; }
+      .step-num { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--border); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+      .step.active .step-num { background: var(--fg); color: #fff; border-color: var(--fg); }
+      .step.done   .step-num { background: #16a34a; color: #fff; border-color: #16a34a; }
+      .step-line { width: 32px; height: 1px; background: var(--border); margin: 0 8px; }
+
+      /* Buttons */
+      .btn-ghost { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: transparent; color: var(--muted); font-family: var(--font-body); font-size: 13.5px; font-weight: 500; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: background .15s, color .15s; letter-spacing: -.1px; }
+      .btn-ghost:hover { background: var(--btn-ghost-hover); color: var(--fg); }
+
+      /* Main */
+      .main { display: grid; place-items: center; padding: 24px; }
+
+      .content { width: 100%; max-width: 460px; animation: fadeUp .4s ease both; }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+
+      /* Success animation */
+      .success-ring {
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        background: #f0fdf4;
+        border: 1.5px solid #bbf7d0;
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-bottom: 20px;
+        animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+      }
+      @keyframes popIn { from{transform:scale(.6);opacity:0;} to{transform:scale(1);opacity:1;} }
+
+      .headline { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 8px; line-height: 1.2; }
+      .sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+
+      /* Info card */
+      .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0; margin-bottom: 20px; box-shadow: var(--shadow-card); overflow: hidden; }
+
+      .info-row { display: flex; align-items: center; padding: 12px 18px; gap: 12px; }
+      .info-row + .info-row { border-top: 1px solid var(--border); }
+      .info-label { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; min-width: 72px; }
+      .info-value { font-size: 13.5px; color: var(--fg); word-break: break-all; }
+
+      /* Plan badge */
+      .plan-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #7c3aed; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 100px; padding: 3px 9px; }
+
+      /* Order mini */
+      .order-summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 20px; box-shadow: var(--shadow-card); }
+      .order-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 4px 0; }
+      .order-row .label { color: var(--muted); }
+      .order-total-row { display: flex; justify-content: space-between; font-family: var(--font-head); font-size: 14px; font-weight: 600; padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--border); }
+
+      /* Action row */
+      .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+      .btn-primary { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; background: var(--btn-bg); color: var(--btn-fg); font-family: var(--font-body); font-size: 13.5px; font-weight: 500; border: none; border-radius: var(--radius-sm); cursor: pointer; transition: background .15s; letter-spacing: -.1px; }
+      .btn-primary:hover { background: var(--btn-hover); }
+    </style>
+  </head>
+  <body>
+
+    <div id="loadingScreen">
+      <div><span class="loader-dot"></span><span class="loader-dot"></span><span class="loader-dot"></span></div>
+    </div>
+
+    <div class="page" id="appPage" style="display:none">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-brand">
+          <div class="logo-mark">
+            <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+              <path d="M9 2L15.5 5.75V12.25L9 16L2.5 12.25V5.75L9 2Z" fill="white" stroke="white" stroke-width="1"/>
+            </svg>
+          </div>
+          <span class="brand-name">Acme</span>
+        </div>
+
+        <div class="steps">
+          <div class="step done">
+            <span class="step-num"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>
+            Sign in
+          </div>
+          <div class="step-line"></div>
+          <div class="step done">
+            <span class="step-num"><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>
+            Checkout
+          </div>
+          <div class="step-line"></div>
+          <div class="step active"><span class="step-num">3</span> Account</div>
+        </div>
+
+        <button class="btn-ghost" onclick="handleSignOut()">Sign out</button>
+      </header>
+
+      <!-- Main -->
+      <main class="main">
+        <div class="content">
+
+          <div class="success-ring">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+
+          <h1 class="headline">You're all set!</h1>
+          <p class="sub">Your purchase was successful. Here's a summary of your account and order.</p>
+
+          <!-- Account info -->
+          <div class="info-card">
+            <div class="info-row">
+              <span class="info-label">Email</span>
+              <span class="info-value" id="userEmail">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Plan</span>
+              <span class="info-value">
+                <span class="plan-badge">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  Pro
+                </span>
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Member since</span>
+              <span class="info-value" id="memberSince">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">User ID</span>
+              <span class="info-value" id="userId" style="font-size:12px;color:var(--muted)">—</span>
+            </div>
+          </div>
+
+          <!-- Order summary -->
+          <div class="order-summary">
+            <div class="order-row"><span class="label">Pro Plan (annual)</span><span>€79.00</span></div>
+            <div class="order-row"><span class="label">Discount (20%)</span><span style="color:#16a34a">−€15.80</span></div>
+            <div class="order-row"><span class="label">VAT (23%)</span><span style="color:var(--muted)">€14.57</span></div>
+            <div class="order-total-row"><span>Total charged</span><span>€77.77</span></div>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-primary" onclick="goToDashboard()">
+              Go to dashboard
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn-ghost" onclick="handleSignOut()">Sign out</button>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const { createClient } = supabase;
+      const _supabase = createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
+
+      // Guard
+      (async () => {
+        const { data: { session } } = await _supabase.auth.getSession();
+        if (!session) { window.location.replace("index.html"); return; }
+        populateUI(session.user);
+        reveal();
+      })();
+
+      _supabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_OUT") window.location.replace("index.html");
+      });
+
+      function populateUI(user) {
+        document.getElementById("userEmail").textContent   = user.email || "—";
+        document.getElementById("userId").textContent      = user.id    || "—";
+        document.getElementById("memberSince").textContent = user.created_at
+          ? new Date(user.created_at).toLocaleDateString(undefined, { dateStyle: "long" })
+          : "—";
+      }
+
+      function reveal() {
+        document.getElementById("loadingScreen").classList.add("fade-out");
+        document.getElementById("appPage").style.display = "grid";
+        setTimeout(() => document.getElementById("loadingScreen").remove(), 250);
+      }
+
+      async function handleSignOut() {
+        await _supabase.auth.signOut();
+        window.location.replace("index.html");
+      }
+
+      function goToDashboard() {
+        // Replace with your actual dashboard URL
+        alert("Navigate to your app dashboard here.");
+      }
+    </script>
+  </body>
+</html>
