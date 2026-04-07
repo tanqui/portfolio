@@ -22,9 +22,9 @@
 			height: 300px;
 			position: relative;
 			border: 2px dotted black;
-			perspective: 600px;
-			perspective-origin: center;
-			transform-style: preserve-3d;
+			-webkit-perspective: 600px;
+			-webkit-perspective-origin: center;
+			-webkit-transform-style: preserve-3d;
 
 		}
 		.object {
@@ -43,27 +43,27 @@
 		}
 		#box1 {
 			background: limegreen;
-			animation: face 4s linear infinite;
+			-webkit-animation: face 4s linear infinite;
 		}
 		#box2 {
 			background: magenta;
-			animation: face2 4s linear infinite;
+			-webkit-animation: face2 4s linear infinite;
 		}
 		#box3 {
 			background: blue;
-			animation: top 4s linear infinite;
+			-webkit-animation: top 4s linear infinite;
 		}
 		#box4 {
 			background: yellow;
-			animation: bottom 4s linear infinite;
+			-webkit-animation: bottom 4s linear infinite;
 		}
 		#box5 {
 			background: cyan;
-			animation: face3 4s linear infinite;
+			-webkit-animation: face3 4s linear infinite;
 		}
 		#box6 {
 			background: red;
-			animation: face4 4s linear infinite;
+			-webkit-animation: face4 4s linear infinite;
 		}
 		@keyframes face {
 			from { transform: rotateY(0deg) translateZ(75px); }
@@ -148,10 +148,10 @@
 			width: 300px;
 			height: 300px;
 			position: relative;
-			perspective: 800px;
-			perspective-origin: center;
+			-webkit-perspective: 800px;
+			-webkit-perspective-origin: center;
 			border: 2px dotted black;
-			transform-style: preserve-3d;
+			-webkit-transform-style: preserve-3d;
 		}
 		.planet {
 			position: absolute;
@@ -174,7 +174,7 @@
 			width: 12px;
 			height: 12px;
 			box-shadow: -2px 2px 3px #222 inset;
-			animation: moon 4s linear infinite;
+			-webkit-animation: moon 4s linear infinite;
 		}
 		img {
 			width: 100%;
