@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Rotate on scroll</title>
+	<style>
+
+		body {
+			background: #222;
+		}
+		.container {
+			display: flex;
+			justify-content: center;
+			gap: 50px;
+			padding: 50px;
+			background: #eee;
+			flex-wrap: wrap;
+		}
+		.cubes {
+			width: 300px;
+			height: 300px;
+			position: relative;
+			border: 2px dotted black;
+			perspective: 600px;
+			perspective-origin: center;
+			transform-style: preserve-3d;
+
+		}
+		.object {
+			position: absolute;
+			top: 75px;
+			left: 75px;
+			width: 150px; 
+			height: 150px; 
+			opacity: 80%;
+			font-size: 30px; 
+			text-align: center;
+			align-content: center;
+			}
+		#box0 {
+			border: 2px dotted black;
+		}
+		#box1 {
+			background: limegreen;
+			animation: face 4s linear infinite;
+		}
+		#box2 {
+			background: magenta;
+			animation: face2 4s linear infinite;
+		}
+		#box3 {
+			background: blue;
+			animation: top 4s linear infinite;
+		}
+		#box4 {
+			background: yellow;
+			animation: bottom 4s linear infinite;
+		}
+		#box5 {
+			background: cyan;
+			animation: face3 4s linear infinite;
+		}
+		#box6 {
+			background: red;
+			animation: face4 4s linear infinite;
+		}
+		@keyframes face {
+			from { transform: rotateY(0deg) translateZ(75px); }
+			to { transform: rotateY(360deg) translateZ(75px); } 
+		}
+		@keyframes face2 {
+			from { transform: rotateY(0deg) translateZ(-75px); }
+			to { transform: rotateY(360deg) translateZ(-75px); } 
+		}
+		@keyframes face3 {
+			from { transform: rotateY(0deg) translateX(75px) rotateY(90deg); }
+			to { transform: rotateY(360deg) translateX(75px) rotateY(90deg); } 
+		}
+		@keyframes face4 {
+			from { transform: rotateY(0deg) translateX(-75px) rotateY(90deg); }
+			to { transform: rotateY(360deg) translateX(-75px) rotateY(90deg); } 
+		}
+		@keyframes top {
+			from { transform: rotateY(0deg) translateY(-75px) rotateX(90deg); }
+			to { transform: rotateY(360deg) translateY(-75px) rotateX(90deg); } 
+		}
+		@keyframes bottom {
+			from { transform: rotateY(0deg) translateY(75px) rotateX(90deg); }
+			to { transform: rotateY(360deg) translateY(75px) rotateX(90deg); } 
+		}
+		#box {
+			animation: orbitx 4s linear infinite;
+			border: 2px dotted black;
+		}
+		#box7 {
+			background: limegreen;
+			animation: orbit 8s linear infinite;
+		}
+		#box8 {
+			background: magenta;
+			animation: orbit2 8s linear infinite;
+		}
+		#box9 {
+			background: blue;
+			animation: orbit5 8s linear infinite;
+		}
+		#box10 {
+			background: yellow;
+			animation: orbit6 8s linear infinite;
+		}
+		#box11 {
+			background: cyan;
+			animation: orbit3 8s linear infinite;
+		}
+		#box12 {
+			background: red;
+			animation: orbit4 8s linear infinite;
+		}
+		@keyframes orbit {
+			from { transform: rotateY(0deg) rotateX(360deg) translateZ(75px); }
+			to { transform: rotateY(360deg) rotateX(0deg) translateZ(75px); } 
+		}
+		@keyframes orbit2 {
+			from { transform: rotateY(0deg) rotateX(360deg) translateZ(-75px); }
+			to { transform: rotateY(360deg) rotateX(0deg) translateZ(-75px); } 
+		}
+		@keyframes orbit3 {
+			from { transform: rotateY(0deg) rotateX(360deg) translateX(75px) rotateY(90deg); }
+			to { transform: rotateY(360deg) rotateX(0deg) translateX(75px) rotateY(90deg); } 
+		}
+		@keyframes orbit4 {
+			from { transform: rotateY(0deg) rotateX(360deg) translateX(-75px) rotateY(90deg); }
+			to { transform: rotateY(360deg) rotateX(0deg) translateX(-75px) rotateY(90deg); } 
+		}
+		@keyframes orbit5 {
+			from { transform: rotateY(0deg) rotateX(360deg) translateY(-75px) rotateX(90deg); }
+			to { transform: rotateY(360deg) rotateX(0deg) translateY(-75px) rotateX(90deg); } 
+		}
+		@keyframes orbit6 {
+			from { transform: rotateY(0deg) rotateX(360deg) translateY(75px) rotateX(90deg); }
+			to { transform: rotateY(360deg) rotateX(0deg) translateY(75px) rotateX(90deg); } 
+		}
+		.space {
+			background: #111;
+		}
+		.system {
+			width: 300px;
+			height: 300px;
+			position: relative;
+			perspective: 800px;
+			perspective-origin: center;
+			border: 2px dotted black;
+			transform-style: preserve-3d;
+		}
+		.planet {
+			position: absolute;
+			border-radius: 50%;
+		}
+		#earth {
+			background: no-repeat url("earth.jpg");
+			background-size: contain;
+			top: 125px;
+			left: 125px;
+			width: 50px;
+			height: 50px;
+			box-shadow: -8px -8px 12px #002 inset;
+			overflow: hidden;
+		}
+		#moon {
+			background: lightgrey;
+			top: 144px;
+			left: 144px;
+			width: 12px;
+			height: 12px;
+			box-shadow: -2px 2px 3px #222 inset;
+			animation: moon 4s linear infinite;
+		}
+		img {
+			width: 100%;
+		}
+		@keyframes moon {
+			0% {transform: rotate(-15deg) rotateX(80deg) rotateZ(0deg) translateX(100px) rotateX(90deg) rotateY(360deg);}
+			50% {transform: rotate(-15deg) rotateX(80deg) rotateZ(180deg) translateX(100px) rotateX(90deg) rotateY(180deg);}
+			100% {transform: rotate(-15deg) rotateX(80deg) rotateZ(360deg) translateX(100px) rotateX(90deg) rotateY(0deg);}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="cubes">
+			<div class="object" id="box0"></div>
+			<div class="object" id="box1">1</div>
+			<div class="object" id="box2">2</div>
+			<div class="object" id="box3">3</div>
+			<div class="object" id="box4">4</div>
+			<div class="object" id="box5">5</div>
+			<div class="object" id="box6">6</div>
+		</div>
+		<div class="cubes">
+			<div class="object" id="box"></div>
+			<div class="object" id="box7">1</div>
+			<div class="object" id="box8">2</div>
+			<div class="object" id="box9">3</div>
+			<div class="object" id="box10">4</div>
+			<div class="object" id="box11">5</div>
+			<div class="object" id="box12">6</div>
+		</div>
+		<div class="space">
+		<div class="system">
+			<div class="planet" id="earth">
+			</div>
+			<div class="planet" id="moon">
+			</div>
+		</div>
+	</div>
+	</div>
+</body>
+</html>
